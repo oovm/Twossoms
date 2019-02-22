@@ -1,0 +1,16 @@
+{
+    "rules": {
+        "semicolon": [true, "never"],
+        "quotemark": [true, "single", "avoid-escape", "avoid-template"],
+        "indent": [true, "space", 4],
+        "no-var-requires": true,
+        "member-access": false,
+        "trailing-comma": true
+    },
+    "linterOptions": {
+        "exclude": [
+            "**/dist/**",
+            "*.d.ts"
+        ]
+    }
+}

@@ -1,0 +1,20 @@
+# IDE
+.vs/*
+.vscode/*
+.idea/*
+*.iml
+
+# Build
+dist/
+share/*
+node_modules/
+
+# Metadata
+*-map.json
+
+# yarn
+yarn.lock
+
+# temp
+*.mx
+*-base.csv

@@ -1,0 +1,8 @@
+{
+    "references": [
+        {
+            "path": "./projects/database-idiom"
+        }
+    ],
+    "files": []
+}
