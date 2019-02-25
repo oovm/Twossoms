@@ -58,4 +58,40 @@ Block[
 		CharacterEncoding -> "UTF8"
 	]
 ];
-$finish=Now;
+$finish = Now;
+
+
+(* ::Section:: *)
+(*Report*)
+
+
+hash[local_] := IntegerString[FileHash[FileNameJoin[{$here, local}]], 16];
+Block[
+	{this, cache, report},
+	this = Tr[FileHash[FileNameJoin[{$here, First@#}]]& /@ $tasks];
+	cache = FileNameJoin[{$here, "chche.mx"}];
+	If[
+		!FileExistsQ@cache,
+		Export[cache, this],
+		If[Import@cache == this, Return[Null]]
+	];
+	report = {
+		{"## Idioms Database Log"},
+		
+		{"- Date: ", $now},
+		
+		{"- Source: ", $source},
+		
+		{"- Downloading: ", $download - $now},
+		
+		{"- Processing: ", $finish - $download},
+		
+		{},
+		
+		{"|File|Hash|"},
+		{"|----|----|"},
+		Apply[Sequence, {"|", #1, "|", hash@#1, "|"}& @@@ $tasks]
+		
+	};
+	Export[FileNameJoin[{$here, "Readme.md"}], StringRiffle[report, "\n", ""], "Text"]
+];
