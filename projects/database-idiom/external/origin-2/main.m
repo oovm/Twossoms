@@ -4,7 +4,7 @@
 (*Settings*)
 
 
-$source = "https://github.com/by-syk/chinese-idiom-db";
+$source = "https://github.com/pwxcoo/chinese-xinhua";
 $here = NotebookDirectory[];
 $now = Now;
 
@@ -20,7 +20,7 @@ $now = Now;
 $tasks = {
 	{
 		"download.mx",
-		"https://github.com/by-syk/chinese-idiom-db/raw/master/chinese-idioms-12976.txt"
+		"https://github.com/pwxcoo/chinese-xinhua/raw/master/data/idiom.json"
 	}
 };
 
@@ -45,11 +45,11 @@ $download = Now;
 (*Export*)
 
 
-read[local_] := Import[FileNameJoin[{$here, local}], "CSV"];
+read[local_] := Import[FileNameJoin[{$here, local}], "RawJSON"];
 Block[
 	{data},
-	data = Apply[Join, read@*First /@ $tasks][[All, {2, 3, 4}]];
-	data = MapAt[StringRiffle@*StringSplit, data, {All, 2}];
+	data = Apply[Join, read@*First /@ $tasks];
+	data = Query[All, {#word, #pinyin, #explanation}&]@data;
 	data = SortBy[Append[#, ""]& /@ DeleteDuplicatesBy[data, First], Rest];
 	Export[
 		FileNameJoin[{DirectoryName@$here, FileBaseName@$here <> ".mx"}],
