@@ -1,0 +1,8 @@
+{
+    "name": "@twossoms/database-song",
+    "version": "0.1.0",
+    "main": "dist/index.js",
+    "license": "CC0",
+    "dependencies": {},
+    "devDependencies": {}
+}
