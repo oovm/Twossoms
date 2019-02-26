@@ -2,7 +2,7 @@
     "name": "@twossoms/database-idioms",
     "version": "0.1.0",
     "main": "dist/index.js",
-    "license": "MIT",
+    "license": "CC0",
     "dependencies": {},
     "devDependencies": {}
 }
