@@ -4,7 +4,7 @@
 (*Settings*)
 
 
-$source = "https://github.com/by-syk/chinese-idiom-db";
+$source = "https://github.com/chinese-poetry/chinese-poetry";
 $here = NotebookDirectory[];
 $now = Now;
 
@@ -17,12 +17,10 @@ $now = Now;
 (*Tasks*)
 
 
-$tasks = {
-	{
-		"download.mx",
-		"https://github.com/by-syk/chinese-idiom-db/raw/master/chinese-idioms-12976.txt"
-	}
-};
+$tasks = GeneralUtilities`Scope[
+	url = StringTemplate["https://github.com/chinese-poetry/chinese-poetry/raw/master/ci/ci.song.`i`.json"];
+	Table[{"download-" <> IntegerString[i + 1, 10, 2] <> ".mx", url[<|"i" -> 1000i|>]}, {i, 0, 21}]
+];
 
 
 (* ::Subsection:: *)
@@ -47,14 +45,17 @@ $download = Now;
 
 read[local_] := Import[FileNameJoin[{$here, local}], "RawJson"];
 Block[
-	{data},
-	data = Apply[Join, read@*First /@ $tasks][[All, {2, 3, 4}]];
-	data = MapAt[StringRiffle@*StringSplit, data, {All, 2}];
-	data = SortBy[Append[#, ""]& /@ DeleteDuplicatesBy[data, First], Rest];
+	{format, data},
+	format = <|
+		"Title" -> #rhythmic,
+		"Author" -> #author,
+		"Ci" -> StringRiffle[ #paragraphs, "|"]
+	|>&;
+	data = Apply[Join, read@*First /@ $tasks];
+	data = Query[All, format]@Apply[Join, read@*First /@ $tasks];
 	Export[
 		FileNameJoin[{DirectoryName@$here, FileBaseName@$here <> ".mx"}],
-		data, "CSV",
-		"TableHeadings" -> {"Idiom", "Pinyin", "Explanation"},
+		Dataset@data, "CSV",
 		CharacterEncoding -> "UTF8"
 	]
 ];
