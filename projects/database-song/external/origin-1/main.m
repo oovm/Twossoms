@@ -43,7 +43,25 @@ $download = Now;
 (*Export*)
 
 
-read[local_] := Import[FileNameJoin[{$here, local}], "RawJson"];
+toASCII[s_String] := s;
+toASCII[i_Integer] := If[i < 127, FromCharacterCode@i, i];
+checkUTF[s_String] := s;
+checkUTF[l_List] := GeneralUtilities`Scope[
+(*seq=Partition[l,{UpTo[3]}];*)
+	seq = Quiet@Check[
+		FromCharacterCode[l, "UTF-8"],
+		FromCharacterCode[Flatten@SequenceSplit[l, {240, a_, b_, c_} :> {9633}], "UTF-8"]
+	];
+	StringJoin@seq
+];
+read[local_] := GeneralUtilities`Scope[
+	byte = Normal@ReadByteArray@FileNameJoin[{$here, local}];
+	str = checkUTF /@ SequenceSplit[toASCII /@ byte, {s_String} :> StringJoin@s];
+	Return[str];
+	ImportString[StringJoin@str, "RawJSON"]
+];
+
+
 Block[
 	{format, data},
 	format = <|
@@ -60,3 +78,6 @@ Block[
 	]
 ];
 $finish = Now;
+
+
+
