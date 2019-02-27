@@ -1,0 +1,16 @@
+{
+    "name": "idiom-database",
+    "version": [
+        1,
+        0,
+        0
+    ],
+    "files": [
+        {
+            "name": "idioms.csv",
+            "version": 1,
+            "md5": "42d1106abaf37e73acf94a8485efb704",
+            "update": "Wed 27 Feb 2019 12:22:18"
+        }
+    ]
+}
