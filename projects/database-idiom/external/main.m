@@ -1,19 +1,20 @@
 (* ::Package:: *)
 
-(* ::Section:: *)
+(* ::Chapter:: *)
 (*Setting*)
 
 
 $now = Now;
 $here = NotebookDirectory[];
 $release = FileNameJoin[{DirectoryName@$here, "release"}];
+$ = Association[];
 
 
-(* ::Section:: *)
+(* ::Chapter:: *)
 (*Main*)
 
 
-(* ::Section:: *)
+(* ::Subchapter:: *)
 (*Functions*)
 
 
@@ -27,11 +28,11 @@ addLetter = <|
 |>&;
 
 
-(* ::Section:: *)
+(* ::Subchapter:: *)
 (*Export Base Data *)
 
 
-(* ::Section:: *)
+(* ::Subsection:: *)
 (*Import*)
 
 
@@ -39,15 +40,15 @@ data1 := data1 = Import[FileNameJoin[{$here, "origin-1.mx"}], "CSV"];
 data2 := data2 = Import[FileNameJoin[{$here, "origin-2.mx"}], "CSV"];
 
 
-(* ::Section:: *)
+(* ::Subsection:: *)
 (*Data*)
 
 
 data = Join[data1, data2];
-data = SortBy[Append[#, ""]& /@ DeleteDuplicatesBy[data, First], Rest];
+data = SortBy[DeleteDuplicatesBy[data, First], Rest];
 
 
-(* ::Section:: *)
+(* ::Subsection:: *)
 (*Export*)
 
 
@@ -59,7 +60,16 @@ Export[
 ];
 
 
-(* ::Section:: *)
+Export[
+	"database-3char.csv",
+	GroupBy[data[[All, ;; 3]], StringLength@*First][3],
+	"TableHeadings" -> {"Idiom", "Pinyin", "Explanation"},
+	CharacterEncoding -> "UTF8"
+];
+
+
+
+(* ::Subchapter:: *)
 (*Import Fix*)
 
 
@@ -94,7 +104,7 @@ $remove := GeneralUtilities`Scope[
 ];
 
 
-(* ::Section:: *)
+(* ::Subchapter:: *)
 (*Apply Fix*)
 
 
@@ -109,21 +119,45 @@ Export[
 ]
 
 
-(* ::Section:: *)
-(*Additional*)
+With[
+	{name = "idioms.csv"},
+	Export[
+		FileNameJoin[{$release, name}],
+		Select[data, StringLength@First[#] > 3&],
+		"TableHeadings" -> {"Idiom", "Pinyin", "Explanation", "Synonym"},
+		CharacterEncoding -> "UTF8"
+	];
+	$[name] = IntegerString[FileHash[FileNameJoin[{$release, name}], "MD5"], 16]
+]
 
 
-Export[
-	"database-3char.csv",
-	GroupBy[data[[All, ;; 3]], StringLength@*First][3],
-	"TableHeadings" -> {"Idiom", "Pinyin", "Explanation"},
-	CharacterEncoding -> "UTF8"
-];
-
-
-(* ::Section:: *)
+(* ::Chapter:: *)
 (*Report*)
 
 
-(* ::Section:: *)
+(* ::Chapter:: *)
 (*Record*)
+
+
+Block[
+	{record, old, updater, new},
+	record = Import[FileNameJoin[{$release, "record.json"}], "RawJSON"];
+	old = record["files"];
+	updater = If[
+		$[#name] != #md5,
+		<|"name" -> #name, "version" -> #version + 1, "md5" -> $[#name], "update" -> DateString[$now]|>,
+		#
+	]&;
+	new = SortBy[updater /@ old, #name&];
+	If[
+		Tr[#version& /@ new] > Tr[#version& /@ old],
+		Export[
+			FileNameJoin[{$release, "record.json"}],
+			<|
+				"name" -> record["name"],
+				"version" -> record["version"] + {0, 0, 1},
+				"files" -> new
+			|>
+		]
+	]
+];
