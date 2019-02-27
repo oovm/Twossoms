@@ -8,6 +8,7 @@
 dist/
 share/*
 node_modules/
+**/release/*.csv
 
 # Metadata
 *-map.json
