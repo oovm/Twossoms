@@ -47,7 +47,6 @@ toASCII[s_String] := s;
 toASCII[i_Integer] := If[i < 127, FromCharacterCode@i, i];
 checkUTF[s_String] := s;
 checkUTF[l_List] := GeneralUtilities`Scope[
-(*seq=Partition[l,{UpTo[3]}];*)
 	seq = Quiet@Check[
 		FromCharacterCode[l, "UTF-8"],
 		FromCharacterCode[Flatten@SequenceSplit[l, {240, a_, b_, c_} :> {9633}], "UTF-8"]
@@ -55,10 +54,13 @@ checkUTF[l_List] := GeneralUtilities`Scope[
 	StringJoin@seq
 ];
 read[local_] := GeneralUtilities`Scope[
-	byte = Normal@ReadByteArray@FileNameJoin[{$here, local}];
-	str = checkUTF /@ SequenceSplit[toASCII /@ byte, {s_String} :> StringJoin@s];
-	Return[str];
-	ImportString[StringJoin@str, "RawJSON"]
+	Quiet@Check[
+		Import[FileNameJoin[{$here, local}], "RawJSON"],
+		byte = Normal@ReadByteArray@FileNameJoin[{$here, local}];
+		str = Flatten@SequenceSplit[byte, {240, a_, b_, c_} :> {226, 150, 161}];
+		Export["tmp.mx", FromCharacterCode[str, "UTF-8"], "Text"];
+		Import["tmp.mx", "RawJSON"]
+	]
 ];
 
 
@@ -71,6 +73,7 @@ Block[
 	|>&;
 	data = Apply[Join, read@*First /@ $tasks];
 	data = Query[All, format]@Apply[Join, read@*First /@ $tasks];
+	(*data=Query[All,If[#Ci=="",Nothing,#]&]@SortBy[data,#Author&];*)
 	Export[
 		FileNameJoin[{DirectoryName@$here, FileBaseName@$here <> ".mx"}],
 		Dataset@data, "CSV",
@@ -80,4 +83,37 @@ Block[
 $finish = Now;
 
 
+(* ::Section:: *)
+(*Report*)
 
+
+hash[local_] := IntegerString[FileHash[FileNameJoin[{$here, local}]], 16];
+Block[
+	{this, cache, report},
+	this = Tr[FileHash[FileNameJoin[{$here, First@#}]]& /@ $tasks];
+	cache = FileNameJoin[{$here, "chche.mx"}];
+	If[
+		!FileExistsQ@cache,
+		Export[cache, this],
+		If[Import@cache == this, Return[]]
+	];
+	report = {
+		{"## Idioms Database Log"},
+		
+		{"- Date: ", $now},
+		
+		{"- Source: ", $source},
+		
+		{"- Downloading: ", $download - $now},
+		
+		{"- Processing: ", $finish - $download},
+		
+		{},
+		
+		{"|File|Hash|"},
+		{"|----|----|"},
+		Apply[Sequence, {"|", #1, "|", hash@#1, "|"}& @@@ $tasks]
+		
+	};
+	Export[FileNameJoin[{$here, "Readme.md"}], StringRiffle[report, "\n", ""], "Text"]
+];
