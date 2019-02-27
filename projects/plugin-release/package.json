@@ -1,0 +1,12 @@
+{
+    "name": "@twossoms/plugin-release",
+    "version": "1.0.0",
+    "main": "source/index.ts",
+    "license": "CC0",
+    "dependencies": {
+        "archiver": "^3.0.0"
+    },
+    "devDependencies": {
+        "@types/archiver": "^2.1.2"
+    }
+}

@@ -16,6 +16,7 @@ node_modules/
 # yarn
 yarn.lock
 
-# temp
+# Release
+*.zip
 *.mx
 *-base.csv
