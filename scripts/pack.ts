@@ -1,3 +1,7 @@
 import { pack } from "@twossoms/plugin-release";
 
-pack()
+const projects = [
+    'database-idiom'
+]
+
+pack(projects)
