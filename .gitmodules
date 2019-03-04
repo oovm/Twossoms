@@ -1,0 +1,3 @@
+[submodule "3rd-party/api.ctext.org"]
+	path = 3rd-party/api.ctext.org
+	url = https://github.com/GalAster/api.ctext.org.git
