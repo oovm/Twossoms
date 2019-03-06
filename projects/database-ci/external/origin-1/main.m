@@ -98,7 +98,7 @@ Block[
 		If[Import@cache == this, Return[]]
 	];
 	report = {
-		{"## Idioms Database Log"},
+		{"## Ci Database Log"},
 		
 		{"- Date: ", $now},
 		

@@ -1,4 +1,4 @@
-## Idioms Database Log
+## Ci Database Log
 - Date: Wed 27 Feb 2019 03:26:00
 - Source: https://github.com/chinese-poetry/chinese-poetry
 - Downloading: 11.4454 s
