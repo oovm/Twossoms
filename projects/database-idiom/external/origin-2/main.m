@@ -54,7 +54,7 @@ Block[
 	Export[
 		FileNameJoin[{DirectoryName@$here, FileBaseName@$here <> ".mx"}],
 		data, "CSV",
-		"TableHeadings" -> {"Idiom", "Pinyin", "Explanation"},
+		"TableHeadings" -> {"Idiom", "Pinyin", "Explanation", "Synonym"},
 		CharacterEncoding -> "UTF8"
 	]
 ];
